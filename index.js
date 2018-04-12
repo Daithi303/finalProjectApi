@@ -26,7 +26,7 @@ deviceRouter.init(server);
 authenticateRouter.init(server);
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
-server.use('/api/authenticate', authenticateRouter.router);
+//server.use('/api/authenticate', authenticateRouter.router);
 server.use('/api/user', userRouter.router);
 server.use('/api/device', deviceRouter.router);
 

@@ -34,6 +34,7 @@ function getUserInXml(userObj){
 }
 
 //Authenticate with token
+/*
 router.use(
 function(req, res, next) {
   var token = req.headers['x-access-token'];
@@ -56,7 +57,7 @@ function(req, res, next) {
   }
 }
 );
-
+*/
 //Get a user (json and xml)
 router.get('/:userId', (req, res) => {
   Model.User.findById(req.params.userId, (err, user) => {
