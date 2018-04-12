@@ -1,0 +1,34 @@
+{
+  "name": "api-project",
+  "version": "1.0.0",
+  "description": "This is the project required for the web service development module's first assignmnet",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec babel-node index.js"
+  },
+  "author": "Daithi303",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.2",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.18.1",
+    "eslint-config-google": "^0.9.1",
+    "nodemon": "^1.15.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "crypto": "^1.0.1",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.2",
+    "gulp": "^3.9.1",
+    "js2xmlparser": "^3.0.0",
+    "json2xml": "^0.1.3",
+    "jsonwebtoken": "^8.2.0",
+    "lodash": "^4.17.5",
+    "moment": "^2.21.0",
+    "mongoose": "^5.0.8",
+    "mongoose-unique-array": "^0.2.0",
+    "rand-token": "^0.4.0"
+  }
+}
