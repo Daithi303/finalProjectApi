@@ -3,6 +3,7 @@ import Model from './../model/model.js';
 import _ from 'lodash';
 import jwt from 'jsonwebtoken';
 import json2xml from 'json2xml';
+import moment from 'moment';
 const router = express.Router(); 
 var server = null;
 
@@ -12,12 +13,12 @@ function init(serverIn) {
 
 
 //this function converts the mongoose object to a plain object so the salt and hashed password properties can be removed before sending the object as a response
-function convertAndFormatMongooseObjectToPlainObject(user){
-	var userObj = user.toObject();
-	userObj = removeSaltAndHash(userObj);
-	return userObj;
-}
+function convertAndFormatMongooseObjectToPlainObject(sensorState){
+	var sensorStateObj = sensorState.toObject();
 
+	return sensorStateObj;
+}
+/*
 //this function removes the salt and hashedPassword properties from the plain object
 function removeSaltAndHash(userObj){
 	delete userObj.hashedPassword;
@@ -32,7 +33,7 @@ function getUserInXml(userObj){
 			var response = json2xml({user: userObj});
 			return response;
 }
-
+*/
 //Authenticate with token
 /*
 router.use(
@@ -58,25 +59,22 @@ function(req, res, next) {
 }
 );
 */
-//Get a user (json and xml)
-router.get('/:userId', (req, res) => {
-  Model.User.findById(req.params.userId, (err, user) => {
-    if (err) return handleError(res, err);
-	 if (!user) return res.status(404).json({User: "Not found"});
-    res.format({
-		'application/xml': function(){
-			return res.status(200).send(getUserInXml(convertAndFormatMongooseObjectToPlainObject(user)));
-		},
-		'application/json': function(){
-			return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(user));
-		}
+//Get all sensor states by deviceId (json and xml)
+router.get('/:deviceId', (req, res) => {
+	Model.SensorState.find({ deviceId: req.params.deviceId },(err,sensorState)=>{
+	 if (err) return handleError(res, err);	
+		if (!sensorState) return res.status(404).json({SensorStatetNotFound: "Sensor State Not found"});
+		return res.status(201).send(sensorState);
 	});
-  });
 });
 
-//Get all users (json and xml)
+
+
+
+/*
+//Get all sensor states (json and xml)
 router.get('/', (req, res) => {
-  Model.User.find((err, users) => {
+  Model.S.find((err, users) => {
     if (err) return handleError(res, err);
 	 if (!users) return res.status(404).json({Users: "Not found"});
     res.format({
@@ -109,22 +107,28 @@ router.post('/', (req, res) => {
     return res.status(201).send(convertAndFormatMongooseObjectToPlainObject(user));
   });
 });
+*/
 
 // Update a user
-router.put('/:userId', (req, res) => {
+router.put('/:deviceId', (req, res) => {
   if (req.body._id) delete req.body._id;
-   if (req.body.hashedPassword) {delete req.body.hashedPassword;}
-  Model.User.findById(req.params.userId, (err, user) => {
+if (req.body.deviceId) delete req.body.deviceId;
+  Model.SensorState.find({ deviceId: req.params.deviceId },(err,sensorState)=>{
     if (err) return handleError(res, err);
-    if (!user) return res.send(404);
-    const updated = _.merge(user, req.body);
+    if (!sensorState) return res.send(404);
+    var firstSensorState = sensorState[0];
+    const updated = _.merge(firstSensorState, req.body);
     updated.save((err) => {
       if (err) return handleError(res, err);
-      return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(user));
+
+
+      console.log("Sensor state successful: "+ moment().format('D MMM, YYYY'));
+      return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(firstSensorState));
     });
   });
 });
 
+/*
 // Delete a user
 router.delete('/:userId', (req, res) => {
   Model.User.findById(req.params.userId, (err, user) => {
@@ -137,7 +141,7 @@ router.delete('/:userId', (req, res) => {
   });
 });
 
-
+*/
 function handleError(res, err) {
   return res.send(500, err);
 };

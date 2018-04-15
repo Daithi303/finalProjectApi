@@ -5,66 +5,35 @@ const Schema = mongoose.Schema;
 import moment from 'moment';
 import arrayUniquePlugin from 'mongoose-unique-array';
 
-const JourneySchema = new Schema(
-{
-	initiator: {
-		type: Schema.Types.ObjectId, 
-		ref: 'User',
-		required: true
-	},
-	startDateTime: {
-		type : String, 
-		default: function(){
-			return moment().format('MMMM Do YYYY, h:mm:ss a');
-		} 
-	},
-	finishDateTime: {
-		type : String, 
-		default: function(){
-			return null;rs
-			
-		} 
-	},
-	journeyState: {
+
+const AlertSchema = new Schema({
+	deviceId: {
 		type: String,
-		enum: ['inProgress', 'paused', 'complete'],
-		default: 'inProgress'
+		default: ""
 	},
+	alertType: {
+		type: String,
+		defaurslt: ""
+	},
+	contactType: {
+		type: String,
+		default: ""
+	},
+	secondaryContactName: {
+		type: String,
+		default: ""
+	},
+	secondaryContactNumber: {
+		type: String,
+		default:""
+	},
+  timeOfAlert: { 
+  type: String,
+  default: ""
+  }
 });
 
-const DeviceSchema = new Schema({
-	deviceName: {
-		type: String,
-		default: function() {
-			var devicePrefix = "device_"
-			var deviceSuffix =  randToken.generate(8);
-			var deviceName = devicePrefix+deviceSuffix;
-		return deviceName;}
-	},
-	minTempWarning: {
-		type: Number,
-		default: 2
-	},
-	maxTempWarning: {
-		type: Number,
-		default: 18
-	},
-	minutesToWaitBeforeSecondaryAlert: {
-		type: Number,
-		default:5
-	},
-	minutesAllowedForJourneyPause: {
-		type: Number,
-		default:5
-	},
-  registeredOwner: { 
-  type: Schema.Types.ObjectId,
-  ref: 'User'
-  },
-	journey: [JourneySchema]
-});
-
-var Device =  mongoose.model('Device', DeviceSchema);
+var Alert =  mongoose.model('Alert', AlertSchema);
 /*
 var deviceExists = function(value,respond) {
 	//console.log("Current value in deviceExists: "+ value);
@@ -107,85 +76,44 @@ var manyValidators = [
 ];
 */
 
-const UserSchema = new Schema({
-  fName: {
+const SensorStateSchema = new Schema({
+  deviceId: {
         type: String,
-        required: true
+        default: ""
       },
-  lName: {
+  carSeatStatusValue: {
         type: String,
-        required: true
+        default: ""
       },
-  streetAddress1: {
+  vehicleSpeedValue: {
         type: String,
-        required: true
+        default: ""
       },
-  streetAddress2: {
-        type: String
-      },
-  townCity:{
+  rssiStatusValue: {
         type: String,
-        required: true
+        default: ""
       },
-  countyState: {
+  geoLat:{
         type: String,
-        required: true
+        default: ""
       },
-  email: {
-  type: String,
-  lowercase: true
-  },
-  dateOfBirth: {
-    type: String,
-	required: true,
-	default: function(){return moment().format('MMMM Do YYYY');}
-  },
-  userName: {
-  type: String,
-  required: true
-  },
-  hashedPassword: {
-  type: String,
-  required: true
-  },
-  salt: {
+  geoLong: {
         type: String,
-        default: "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs="
-    },
-	admin: {
-		type: Boolean,
-		required: true,
-		default: false
-	}
+        default: ""
+      },
+      connectionState: {
+        type: String,
+        default: ""
+      },
+      connectionStateTimeStamp: {
+        type: String,
+        default: ""
+      }
 });
 
-UserSchema.virtual('password')
-    .set(function (password) {
-		//this.salt = crypto.randomBytes(32).toString('base64');
-        this.salt = "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs=";
-        this.hashedPassword = this.encryptPassword(password, this.salt);
-    })
-    .get(function () {
-        return this.hashedPassword;
-    });
-
-UserSchema.methods.encryptPassword = function (password, salt) {
-    return crypto.createHmac('sha1', salt).update(password).digest('hex');
-};
-
-UserSchema.methods.checkPassword = function (password) {
-    return this.encryptPassword(password, this.salt) === this.hashedPassword;
-};
-
-
-UserSchema.path('email').validate(function (email) {
-   var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-   return emailRegex.test(email); 
-}, 'The e-mail field cannot be empty.')
-
-var User = mongoose.model('User', UserSchema);
+var SensorState = mongoose.model('SensorState', SensorStateSchema);
 
 module.exports = {
-	Device: Device,
-	User: User	
+	Alert: Alert,
+	SensorState: SensorState
 };
