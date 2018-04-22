@@ -7,58 +7,28 @@ import moment from 'moment';
 const router = express.Router(); 
 var server = null;
 
+/*
+The code for this API was based on an assignment required for our Web Services Development module. The labs on which the assignment was based can be found here:
+https://wit-computing.github.io/web-services-2018/
+
+The Web Services Development module assignment itself was originally based on a portion of my 4th year project's ideal data model. 
+However the data model needed to be re-designed HERE due to time restraints.The original Web Services Development module assignment can be found here:
+https://github.com/Daithi303/WebServDev2018Assignment1
+*/
+
 function init(serverIn) {
   server = serverIn;
 };
 
 
-//this function converts the mongoose object to a plain object so the salt and hashed password properties can be removed before sending the object as a response
+//this function converts the mongoose object to a plain object
 function convertAndFormatMongooseObjectToPlainObject(sensorState){
 	var sensorStateObj = sensorState.toObject();
 
 	return sensorStateObj;
 }
-/*
-//this function removes the salt and hashedPassword properties from the plain object
-function removeSaltAndHash(userObj){
-	delete userObj.hashedPassword;
-	delete userObj.salt;
-	return userObj;
-}
 
-//this function converts the plain object to an xml object
-function getUserInXml(userObj){
-			 var objId = {value: userObj._id.toString()};
-			userObj._id = objId;
-			var response = json2xml({user: userObj});
-			return response;
-}
-*/
-//Authenticate with token
-/*
-router.use(
-function(req, res, next) {
-  var token = req.headers['x-access-token'];
-  if (token) {
-	  var secret = server.get('superSecret');
-    jwt.verify(token, secret, function(err, decoded) {      
-      if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });   	
-      } else {
-        req.decoded = decoded;    
-        next();
-      }
-    });
 
-  } else {
-    return res.status(403).send({ 
-        success: false, 
-        message: 'No token provided.' 
-    });
-  }
-}
-);
-*/
 //Get all sensor states by deviceId (json and xml)
 router.get('/:deviceId', (req, res) => {
 	Model.SensorState.find({ deviceId: req.params.deviceId },(err,sensorState)=>{
@@ -69,47 +39,7 @@ router.get('/:deviceId', (req, res) => {
 });
 
 
-
-
-/*
-//Get all sensor states (json and xml)
-router.get('/', (req, res) => {
-  Model.S.find((err, users) => {
-    if (err) return handleError(res, err);
-	 if (!users) return res.status(404).json({Users: "Not found"});
-    res.format({
-		'application/xml': function(){
-			var response = '';
-			users.forEach(function(user) {
-			response = response + getUserInXml(convertAndFormatMongooseObjectToPlainObject(user));
-});
-			return res.status(200).send('<users>'+response+'</users>');
-		},
-		'application/json': function(){
-			var userObjArray = [];
-			users.forEach(function(user) {
-			userObjArray.push(convertAndFormatMongooseObjectToPlainObject(user));
-			});
-			
-			return res.status(200).send(userObjArray);
-		}
-		
-	});
-  });
-});
-
-//Add a user
-router.post('/', (req, res) => {
-   if (req.body._id) delete req.body._id;
-   if (req.body.hashedPassword) {delete req.body.hashedPassword;}
-  Model.User.create(req.body, function(err, user) {
-    if (err) return handleError(res, err);
-    return res.status(201).send(convertAndFormatMongooseObjectToPlainObject(user));
-  });
-});
-*/
-
-// Update a user
+// Update a sensor state
 router.put('/:deviceId', (req, res) => {
   if (req.body._id) delete req.body._id;
 if (req.body.deviceId) delete req.body.deviceId;
@@ -128,20 +58,6 @@ if (req.body.deviceId) delete req.body.deviceId;
   });
 });
 
-/*
-// Delete a user
-router.delete('/:userId', (req, res) => {
-  Model.User.findById(req.params.userId, (err, user) => {
-    if (err) return handleError(res, err);
-    if (!user) return res.send(404);
-    user.remove(function(err) {
-      if (err) return handleError(res, err);
-      return res.status(200).json({message: "User deleted"});
-    });
-  });
-});
-
-*/
 function handleError(res, err) {
   return res.send(500, err);
 };

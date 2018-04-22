@@ -1,7 +1,6 @@
 import express from 'express';
 import sensorStateRouter from './api/route/sensorStateRouter.js';
 import alertRouter from './api/route/alertRouter.js';
-import authenticateRouter from './api/route/authenticateRouter.js';
 import bodyParser from 'body-parser';
 import Model from './api/model/model.js';
 import dotenv from 'dotenv'
@@ -10,7 +9,14 @@ import {loadSensorStates} from './api/model/sensorStateData';
 import {loadAlerts} from './api/model/alertData';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
+/*
+The code for this API was based on an assignment required for our Web Services Development module. The labs on which the assignment was based can be found here:
+https://wit-computing.github.io/web-services-2018/
 
+The Web Services Development module assignment itself was originally based on a portion of my 4th year project's ideal data model. 
+However the data model needed to be re-designed HERE due to time restraints.The original Web Services Development module assignment can be found here:
+https://github.com/Daithi303/WebServDev2018Assignment1
+*/
 dotenv.config();
 mongoose.connect(process.env.mongoDB);
 
@@ -24,10 +30,8 @@ var server = express();
 server.set('superSecret', process.env.jwtSecret);
 alertRouter.init(server);
 sensorStateRouter.init(server);
-authenticateRouter.init(server);
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
-//server.use('/api/authenticate', authenticateRouter.router);
 server.use('/api/alert', alertRouter.router);
 server.use('/api/sensorState', sensorStateRouter.router);
 
@@ -47,7 +51,8 @@ function checkConnectionState() {
         console.log("difference in seconds: "+differenceInSeconds);
         if(firstSensorState.connectionState=="Connected"&&differenceInSeconds>6){
           const updated = _.merge(firstSensorState,     {
-        "connectionState": "Disconnected"
+        "connectionState": "Disconnected",
+        "vehicleSpeedValue":"0"
     });
               updated.save((err) => {
       if (err) console.log(err);
